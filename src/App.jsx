@@ -8,15 +8,21 @@ import { LoginPage } from './components/LoginPage';
 import './index.css';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState('home');
+  // Show sign-in page first by default
+  const [currentPage, setCurrentPage] = useState('login');
 
   if (currentPage === 'login') {
-    return <LoginPage onBackToHome={() => setCurrentPage('home')} />;
+    return (
+      <LoginPage
+        onLoginSuccess={() => setCurrentPage('analyzer')}
+        onBackToHome={() => setCurrentPage('analyzer')}
+      />
+    );
   }
 
   return (
     <div className="app-wrapper">
-      <Navbar onSignIn={() => setCurrentPage('login')} />
+      <Navbar onSignOut={() => setCurrentPage('login')} />
 
       <main className="main-content">
         <HeroSection />

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Navbar = ({ onSignIn }) => {
+export const Navbar = ({ onSignOut, onSignIn }) => {
   return (
     <header className="navbar">
       <div className="nav-container">
@@ -31,7 +31,16 @@ export const Navbar = ({ onSignIn }) => {
           <a href="#about" className="nav-item inactive">
             About
           </a>
-          {onSignIn ? (
+          {onSignOut ? (
+            <button
+              type="button"
+              onClick={onSignOut}
+              className="nav-item inactive"
+              style={{ background: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+            >
+              Sign Out
+            </button>
+          ) : onSignIn ? (
             <button
               type="button"
               onClick={onSignIn}
@@ -41,8 +50,8 @@ export const Navbar = ({ onSignIn }) => {
               Sign In
             </button>
           ) : (
-            <a href="login.html" className="nav-item inactive">
-              Sign In
+            <a href="index.html" className="nav-item inactive">
+              Sign Out
             </a>
           )}
         </nav>

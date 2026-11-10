@@ -24,14 +24,17 @@ Pixel-accurate recreation of the **Digital Shadow – Privacy Risk Analyzer** cy
 ## 📁 Project Structure
 
 ```
-├── index.html                   # Landing page (zero-dependency, pixel-perfect production HTML)
-├── login.html                   # Login authentication page (matching design system & zero dependencies)
+├── index.html                   # Default landing / entry page (Sign In Portal)
+├── analyzer.html                # Privacy Risk Analyzer Dashboard & report overview
+├── login.html                   # Direct alias for Sign In Portal
+├── vercel.json                  # Vercel clean URL routing configuration
+├── vite.config.js               # Multi-page build configuration
 ├── package.json                 # Frontend dependencies configuration
 ├── src/
-│   ├── App.jsx                  # Main application composition with page state switching
+│   ├── App.jsx                  # Main application composition (Sign in first by default)
 │   ├── index.css                # Global design system, auth styling & responsive breakpoints
 │   └── components/
-│       ├── Navbar.jsx           # Top navigation with logo, brand name, and Sign In trigger
+│       ├── Navbar.jsx           # Top navigation with logo, brand name, and Sign Out trigger
 │       ├── HeroSection.jsx      # Privacy badge, main heading with gradient, description
 │       ├── Statistics.jsx       # Exposure categories, detection rules, local analysis
 │       ├── PrivacyBanner.jsx    # Security statement banner with lock icon & highlighted text
@@ -45,8 +48,8 @@ Pixel-accurate recreation of the **Digital Shadow – Privacy Risk Analyzer** cy
 ## 🚀 How to View
 
 1. **Directly in Browser (No Node/NPM required)**:
-   - Landing page: Double-click [`index.html`](file:///c:/Users/Asus/Desktop/Alfi/index.html)
-   - Login page: Double-click [`login.html`](file:///c:/Users/Asus/Desktop/Alfi/login.html) or click "Sign In" in the navigation bar.
+   - Root / Sign In: Double-click [`index.html`](file:///c:/Users/Asus/Desktop/Alfi/index.html)
+   - Privacy Analyzer: Double-click [`analyzer.html`](file:///c:/Users/Asus/Desktop/Alfi/analyzer.html)
 
 2. **React Development**:
    If Node.js and NPM/pnpm are installed in your environment:

@@ -3,24 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digital Shadow – Privacy Risk Analyzer</title>
+  <title>Sign In – Digital Shadow</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     /* -------------------------------------------------------------
-       CSS RESET & BASE VARIABLES
+       CSS RESET & BASE VARIABLES (MATCHING DIGITAL SHADOW THEME)
     -------------------------------------------------------------- */
     :root {
       --bg-main: #060D19;
       --bg-secondary: #081525;
+      --bg-input: #060e1c;
       --primary-cyan: #08D5F5;
       --electric-blue: #338AF5;
       --purple: #8962F5;
       --text-primary: #EDF2FF;
       --text-secondary: #91A5C6;
       --border-color: #102D42;
-      --border-cyan-glow: rgba(8, 213, 245, 0.35);
+      --border-active: #08D5F5;
       --gradient-accent: linear-gradient(95deg, #06C8EE, #3986F5, #9360EF);
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -43,13 +44,11 @@
       overflow-x: hidden;
     }
 
-    /* Page container to mirror ~1784 x 862 viewport proportions */
     .app-wrapper {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      position: relative;
     }
 
     /* -------------------------------------------------------------
@@ -115,53 +114,56 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
     }
 
     .nav-item {
       text-decoration: none;
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 500;
-      padding: 7px 18px;
+      padding: 7px 16px;
       border-radius: 8px;
       transition: all 0.2s ease;
       cursor: pointer;
-    }
-
-    .nav-item.active {
-      color: var(--primary-cyan);
-      background: rgba(8, 213, 245, 0.08);
-      border: 1px solid rgba(8, 213, 245, 0.25);
-      font-weight: 600;
-    }
-
-    .nav-item.inactive {
       color: var(--text-secondary);
       border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .nav-item.inactive:hover {
+    .nav-item:hover {
       color: var(--text-primary);
       background: rgba(255, 255, 255, 0.03);
     }
 
+    .nav-item.home-link {
+      border: 1px solid var(--border-color);
+      background: rgba(8, 21, 37, 0.6);
+      color: var(--primary-cyan);
+    }
+
+    .nav-item.home-link:hover {
+      border-color: rgba(8, 213, 245, 0.4);
+      background: rgba(8, 213, 245, 0.08);
+    }
+
     /* -------------------------------------------------------------
-       MAIN CONTENT / HERO WRAPPER
+       MAIN AUTH CONTAINER
     -------------------------------------------------------------- */
-    .main-content {
+    .auth-main {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 40px 24px 28px 24px;
-      text-align: center;
-      max-width: 1440px;
+      padding: 48px 24px 32px 24px;
+      max-width: 520px;
       margin: 0 auto;
       width: 100%;
     }
 
-    /* Top Badge */
+    /* Top pill badge */
     .badge-pill {
       display: inline-flex;
       align-items: center;
@@ -175,29 +177,37 @@
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
       box-shadow: 0 0 16px rgba(8, 213, 245, 0.1);
     }
 
     .badge-icon {
       width: 13px;
       height: 13px;
-      stroke-width: 2.5;
     }
 
-    /* Main Heading */
-    .hero-heading {
-      font-size: 58px;
+    /* Auth Card */
+    .auth-card {
+      width: 100%;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 38px 36px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      position: relative;
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .auth-title {
+      font-size: 28px;
       font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.025em;
       color: #FFFFFF;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .hero-heading .desktop-break {
-      display: block;
+      line-height: 1.25;
     }
 
     .gradient-text {
@@ -207,66 +217,284 @@
       display: inline-block;
     }
 
-    /* Hero Description */
-    .hero-description {
-      font-size: 19px;
-      line-height: 1.85;
+    .auth-subtitle {
+      font-size: 14.5px;
       color: var(--text-secondary);
-      max-width: 710px;
-      margin: 22px auto 0 auto;
-      font-weight: 400;
+      margin-top: 10px;
+      line-height: 1.6;
     }
 
-    /* -------------------------------------------------------------
-       STATISTICS SECTION
-    -------------------------------------------------------------- */
-    .statistics-bar {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 48px;
-      margin-bottom: 40px;
-      padding: 10px 0;
-    }
-
-    .stat-item {
+    /* Form Styles */
+    .auth-form {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 0 52px;
+      gap: 20px;
     }
 
-    .stat-number {
-      font-family: var(--font-mono);
-      font-size: 40px;
-      font-weight: 700;
-      color: var(--primary-cyan);
-      line-height: 1;
-      letter-spacing: -0.02em;
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
     }
 
-    .stat-label {
-      font-size: 12px;
+    .form-label {
+      font-size: 13px;
       font-weight: 600;
-      letter-spacing: 0.09em;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      margin-top: 9px;
+      color: var(--text-primary);
+      letter-spacing: 0.02em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .stat-divider {
-      width: 1px;
+    .forgot-link {
+      font-size: 12.5px;
+      color: var(--primary-cyan);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+      color: #38bdf8;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      width: 18px;
+      height: 18px;
+      color: #5d759a;
+      pointer-events: none;
+      transition: color 0.2s ease;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 46px;
+      padding: 0 44px 0 42px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 14.5px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary-cyan);
+      box-shadow: 0 0 0 3px rgba(8, 213, 245, 0.15);
+      background: #081427;
+    }
+
+    .form-input:focus + .input-icon,
+    .input-wrapper:focus-within .input-icon {
+      color: var(--primary-cyan);
+    }
+
+    .form-input::placeholder {
+      color: #4b6282;
+      font-size: 13.5px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: #5d759a;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease;
+    }
+
+    .password-toggle:hover {
+      color: var(--primary-cyan);
+    }
+
+    .password-toggle svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Checkbox & Options */
+    .form-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: -4px;
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      user-select: none;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 17px;
+      height: 17px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--bg-input);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .checkbox-container input[type="checkbox"]:checked {
+      background: var(--primary-cyan);
+      border-color: var(--primary-cyan);
+    }
+
+    .checkbox-container input[type="checkbox"]:checked::after {
+      content: "";
+      width: 5px;
+      height: 9px;
+      border: solid #060D19;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      position: absolute;
+      top: 1px;
+    }
+
+    /* Submit Button */
+    .btn-submit {
+      width: 100%;
       height: 48px;
+      border: none;
+      border-radius: 10px;
+      background: var(--gradient-accent);
+      color: #060D19;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 18px rgba(8, 213, 245, 0.25);
+      margin-top: 6px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(8, 213, 245, 0.4);
+      filter: brightness(1.06);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    /* Divider */
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 22px 0;
+      color: #4b6282;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
       background-color: var(--border-color);
-      flex-shrink: 0;
+    }
+
+    /* Passkey Button */
+    .btn-secondary-auth {
+      width: 100%;
+      height: 46px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: rgba(6, 14, 28, 0.6);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-secondary-auth:hover {
+      border-color: rgba(8, 213, 245, 0.4);
+      background: rgba(8, 213, 245, 0.05);
+      color: var(--primary-cyan);
+    }
+
+    .btn-secondary-auth svg {
+      width: 17px;
+      height: 17px;
+      color: var(--primary-cyan);
+    }
+
+    /* Card Footer */
+    .auth-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .auth-footer a {
+      color: var(--primary-cyan);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .auth-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .guest-link-wrapper {
+      padding-top: 8px;
+      border-top: 1px solid rgba(16, 45, 66, 0.6);
     }
 
     /* -------------------------------------------------------------
-       PRIVACY INFORMATION BANNER
+       BOTTOM SECURITY FOOTER / BANNER
     -------------------------------------------------------------- */
     .banner-wrapper {
       width: 100%;
-      max-width: 1380px;
+      max-width: 900px;
       padding: 0 24px;
       margin: 0 auto 32px auto;
     }
@@ -274,25 +502,25 @@
     .privacy-banner {
       background-color: var(--bg-secondary);
       border: 1px solid var(--border-color);
-      border-radius: 15px;
-      padding: 18px 28px;
+      border-radius: 12px;
+      padding: 14px 22px;
       display: flex;
       align-items: center;
-      gap: 16px;
-      text-align: left;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      justify-content: center;
+      gap: 12px;
+      text-align: center;
     }
 
     .privacy-lock-icon {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       color: var(--primary-cyan);
       flex-shrink: 0;
     }
 
     .privacy-banner-text {
-      font-size: 13.5px;
-      line-height: 1.65;
+      font-size: 12.5px;
+      line-height: 1.55;
       color: var(--text-secondary);
     }
 
@@ -302,166 +530,19 @@
     }
 
     /* -------------------------------------------------------------
-       FLOATING ELEMENTS (BOTTOM RIGHT)
+       RESPONSIVE DESIGN
     -------------------------------------------------------------- */
-    .floating-actions {
-      position: fixed;
-      right: 26px;
-      bottom: 26px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      z-index: 99;
-    }
-
-    .floating-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      border: 1px solid var(--border-color);
-      transition: all 0.2s ease;
-      background-color: var(--bg-secondary);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
-      position: relative;
-    }
-
-    .floating-btn:hover {
-      transform: translateY(-2px);
-      border-color: rgba(8, 213, 245, 0.4);
-      box-shadow: 0 6px 18px rgba(8, 213, 245, 0.2);
-    }
-
-    /* PDF button styling */
-    .floating-btn.pdf-btn {
-      color: #EDF2FF;
-      background: #0B1C30;
-      border-color: #163B57;
-    }
-
-    .floating-btn.pdf-btn svg {
-      width: 19px;
-      height: 19px;
-      color: #F87171;
-    }
-
-    /* AI assistant button styling */
-    .floating-btn.ai-btn {
-      background: #091728;
-      border-color: #173854;
-      color: var(--primary-cyan);
-    }
-
-    .floating-btn.ai-btn svg {
-      width: 19px;
-      height: 19px;
-      color: var(--primary-cyan);
-    }
-
-    /* Tooltip */
-    .floating-btn .tooltip {
-      position: absolute;
-      right: 50px;
-      background: #0c1c30;
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      font-size: 11px;
-      font-weight: 500;
-      padding: 4px 8px;
-      border-radius: 4px;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transform: translateX(6px);
-      transition: all 0.2s ease;
-    }
-
-    .floating-btn:hover .tooltip {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    /* -------------------------------------------------------------
-       RESPONSIVE DESIGN (TABLET & MOBILE)
-    -------------------------------------------------------------- */
-    @media (max-width: 1024px) {
-      .hero-heading {
-        font-size: 46px;
+    @media (max-width: 580px) {
+      .auth-card {
+        padding: 28px 22px;
       }
-      .stat-item {
-        padding: 0 36px;
+
+      .auth-title {
+        font-size: 24px;
       }
+
       .nav-container {
-        padding: 0 24px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .hero-heading {
-        font-size: 34px;
-        line-height: 1.25;
-      }
-
-      .hero-heading .desktop-break {
-        display: inline;
-      }
-
-      .hero-description {
-        font-size: 16px;
-        line-height: 1.65;
-      }
-
-      .statistics-bar {
-        flex-direction: column;
-        gap: 24px;
-        width: 100%;
-        margin-top: 36px;
-        margin-bottom: 32px;
-      }
-
-      .stat-item {
-        padding: 0;
-      }
-
-      .stat-divider {
-        display: none;
-      }
-
-      .privacy-banner {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 16px 20px;
-        gap: 12px;
-      }
-
-      .floating-actions {
-        right: 16px;
-        bottom: 16px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .navbar {
-        height: 65px;
-      }
-
-      .brand-title {
-        font-size: 17px;
-      }
-
-      .hero-heading {
-        font-size: 28px;
-      }
-
-      .stat-number {
-        font-size: 32px;
-      }
-
-      .banner-wrapper {
-        padding: 0 16px;
+        padding: 0 20px;
       }
     }
   </style>
@@ -472,9 +553,8 @@
     <header class="navbar">
       <div class="nav-container">
         <!-- Brand Logo and Name -->
-        <a href="#" class="brand-logo-group">
+        <a href="index.html" class="brand-logo-group">
           <div class="logo-square">
-            <!-- Shield SVG Icon -->
             <svg class="logo-shield-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
@@ -482,102 +562,209 @@
           <span class="brand-title">Digital Shadow</span>
         </a>
 
-        <!-- Navigation Links -->
+        <!-- Quick Access to Analyzer -->
         <nav class="nav-links">
-          <a href="#analyzer" class="nav-item active">Analyzer</a>
-          <a href="#about" class="nav-item inactive">About</a>
-          <a href="login.html" class="nav-item inactive">Sign In</a>
+          <a href="analyzer.html" class="nav-item home-link">
+            <span>Launch Analyzer</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
         </nav>
       </div>
     </header>
 
-    <!-- HERO SECTION & STATISTICS -->
-    <main class="main-content">
-      <!-- Risk Analyzer Badge -->
+    <!-- AUTHENTICATION CARD (SHOWN FIRST) -->
+    <main class="auth-main">
+      <!-- Badge -->
       <div class="badge-pill">
         <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
         </svg>
-        <span>PRIVACY RISK ANALYZER · LOCAL &amp; PRIVATE</span>
+        <span>SECURE ACCESS · LOCAL AUTHENTICATION</span>
       </div>
 
-      <!-- Main Heading with Exact Line Breaks and Targeted Gradient -->
-      <h1 class="hero-heading">
-        How much of your<br class="desktop-break" />
-        <span class="gradient-text">digital shadow</span> is visible?
-      </h1>
-
-      <!-- Description -->
-      <p class="hero-description">
-        Discover what personal information you're unintentionally exposing online. Enter the data you publicly share and receive a detailed, explainable privacy risk report — processed entirely on this server, nothing sent to third parties.
-      </p>
-
-      <!-- Statistics Section -->
-      <section class="statistics-bar" aria-label="Key Statistics">
-        <!-- Statistic 1 -->
-        <div class="stat-item">
-          <div class="stat-number">6</div>
-          <div class="stat-label">EXPOSURE CATEGORIES</div>
+      <!-- Card -->
+      <div class="auth-card">
+        <div class="auth-header">
+          <h1 class="auth-title">
+            Sign in to <span class="gradient-text">Digital Shadow</span>
+          </h1>
+          <p class="auth-subtitle">
+            Enter your credentials to access your local privacy risk dashboard.
+          </p>
         </div>
 
-        <div class="stat-divider" role="separator" aria-orientation="vertical"></div>
+        <form class="auth-form" onsubmit="handleLogin(event)">
+          <!-- Email / Username Input -->
+          <div class="form-group">
+            <label class="form-label" for="email">Work Email or Username</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <input
+                type="email"
+                id="email"
+                class="form-input"
+                placeholder="analyst@domain.com"
+                required
+                autocomplete="email"
+              />
+            </div>
+          </div>
 
-        <!-- Statistic 2 -->
-        <div class="stat-item">
-          <div class="stat-number">15+</div>
-          <div class="stat-label">DETECTION RULES</div>
+          <!-- Password Input -->
+          <div class="form-group">
+            <div class="form-label">
+              <label for="password">Password</label>
+              <a href="#" class="forgot-link" onclick="alert('Password reset link sent to your configured local administrator.'); return false;">Forgot password?</a>
+            </div>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <input
+                type="password"
+                id="password"
+                class="form-input"
+                placeholder="••••••••••••"
+                required
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility()"
+                aria-label="Toggle password visibility"
+              >
+                <!-- Eye Icon -->
+                <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Remember Me Checkbox -->
+          <div class="form-options">
+            <label class="checkbox-container">
+              <input type="checkbox" id="remember" checked />
+              <span>Remember this session</span>
+            </label>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn-submit">
+            <span>Sign In to Dashboard</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+
+          <!-- Divider -->
+          <div class="auth-divider">or authenticate with</div>
+
+          <!-- Security Key / Passkey -->
+          <button type="button" class="btn-secondary-auth" onclick="handlePasskey()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 2l-2 2m-1-1l-3 3m5 5l-8.5 8.5a2.121 2.121 0 0 1-3 0l-1-1a2.121 2.121 0 0 1 0-3L17 5"></path>
+              <circle cx="7.5" cy="16.5" r="1.5"></circle>
+            </svg>
+            <span>Passkey / Hardware Security Key</span>
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <div>
+            <span>Need an analyzer account?</span>
+            <a href="#" onclick="alert('Access requests are approved by your local workspace administrator.'); return false;">Request Access</a>
+          </div>
+          <div class="guest-link-wrapper">
+            <span>Explore as guest?</span>
+            <a href="analyzer.html">Launch Analyzer without login →</a>
+          </div>
         </div>
-
-        <div class="stat-divider" role="separator" aria-orientation="vertical"></div>
-
-        <!-- Statistic 3 -->
-        <div class="stat-item">
-          <div class="stat-number">100%</div>
-          <div class="stat-label">LOCAL ANALYSIS</div>
-        </div>
-      </section>
+      </div>
     </main>
 
-    <!-- PRIVACY INFORMATION BANNER -->
+    <!-- PRIVACY FOOTER -->
     <footer class="banner-wrapper">
       <div class="privacy-banner">
-        <!-- Lock SVG Icon -->
         <svg class="privacy-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
         </svg>
-
-        <!-- Privacy Policy Text with Highlighted Key Terms -->
         <div class="privacy-banner-text">
-          <strong>Your privacy matters.</strong> All analysis runs <strong>locally on this server</strong>. None of your submitted information is transmitted to third-party services. URLs are analyzed structurally — <strong>no outbound requests are made</strong> to any URL you submit. Only a minimal, anonymized report summary is stored if you enable history.
+          <strong>Zero-Knowledge Authentication.</strong> All authentication tokens and keys remain encrypted locally. No credentials or hashes are transmitted externally.
         </div>
       </div>
     </footer>
-
-    <!-- FLOATING ACTIONS (PDF & AI ASSISTANT) -->
-    <aside class="floating-actions" aria-label="Quick Actions">
-      <!-- PDF Document Icon -->
-      <button class="floating-btn pdf-btn" type="button" aria-label="Export PDF report">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="16" y1="13" x2="8" y2="13"></line>
-          <line x1="16" y1="17" x2="8" y2="17"></line>
-          <polyline points="10 9 9 9 8 9"></polyline>
-        </svg>
-        <span class="tooltip">Export PDF</span>
-      </button>
-
-      <!-- AI Assistant Icon -->
-      <button class="floating-btn ai-btn" type="button" aria-label="AI Assistant">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-        </svg>
-        <span class="tooltip">Privacy Assistant</span>
-      </button>
-    </aside>
   </div>
+
+  <script>
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        `;
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.innerHTML = `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        `;
+      }
+    }
+
+    function handleLogin(event) {
+      event.preventDefault();
+      const email = document.getElementById('email').value;
+      const submitBtn = event.target.querySelector('.btn-submit');
+
+      submitBtn.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;">
+          <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+          <path d="M12 2a10 10 0 0 1 10 10"></path>
+        </svg>
+        <span>Authenticating...</span>
+      `;
+      submitBtn.disabled = true;
+
+      setTimeout(() => {
+        window.location.href = 'analyzer.html';
+      }, 700);
+    }
+
+    function handlePasskey() {
+      const passkeyBtn = document.querySelector('.btn-secondary-auth');
+      passkeyBtn.innerHTML = `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;">
+          <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+          <path d="M12 2a10 10 0 0 1 10 10"></path>
+        </svg>
+        <span>Verifying Security Key...</span>
+      `;
+      setTimeout(() => {
+        window.location.href = 'analyzer.html';
+      }, 700);
+    }
+  </script>
+  <style>
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </body>
 </html>
-

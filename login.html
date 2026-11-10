@@ -140,11 +140,12 @@
     .nav-item.home-link {
       border: 1px solid var(--border-color);
       background: rgba(8, 21, 37, 0.6);
+      color: var(--primary-cyan);
     }
 
     .nav-item.home-link:hover {
-      border-color: rgba(8, 213, 245, 0.35);
-      color: var(--primary-cyan);
+      border-color: rgba(8, 213, 245, 0.4);
+      background: rgba(8, 213, 245, 0.08);
     }
 
     /* -------------------------------------------------------------
@@ -467,18 +468,25 @@
       text-align: center;
       font-size: 13.5px;
       color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .auth-footer a {
       color: var(--primary-cyan);
       text-decoration: none;
       font-weight: 600;
-      margin-left: 4px;
       transition: color 0.2s ease;
     }
 
     .auth-footer a:hover {
       text-decoration: underline;
+    }
+
+    .guest-link-wrapper {
+      padding-top: 8px;
+      border-top: 1px solid rgba(16, 45, 66, 0.6);
     }
 
     /* -------------------------------------------------------------
@@ -544,7 +552,7 @@
     <!-- NAVIGATION BAR -->
     <header class="navbar">
       <div class="nav-container">
-        <!-- Brand Logo and Name (links back to landing page) -->
+        <!-- Brand Logo and Name -->
         <a href="index.html" class="brand-logo-group">
           <div class="logo-square">
             <svg class="logo-shield-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -554,14 +562,14 @@
           <span class="brand-title">Digital Shadow</span>
         </a>
 
-        <!-- Return to Home -->
+        <!-- Quick Access to Analyzer -->
         <nav class="nav-links">
-          <a href="index.html" class="nav-item home-link">
+          <a href="analyzer.html" class="nav-item home-link">
+            <span>Launch Analyzer</span>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
-            <span>Back to Home</span>
           </a>
         </nav>
       </div>
@@ -653,7 +661,7 @@
 
           <!-- Submit Button -->
           <button type="submit" class="btn-submit">
-            <span>Sign In</span>
+            <span>Sign In to Dashboard</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
@@ -664,7 +672,7 @@
           <div class="auth-divider">or authenticate with</div>
 
           <!-- Security Key / Passkey -->
-          <button type="button" class="btn-secondary-auth" onclick="alert('Initiating FIDO2 / Passkey challenge locally...');">
+          <button type="button" class="btn-secondary-auth" onclick="handlePasskey()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 2l-2 2m-1-1l-3 3m5 5l-8.5 8.5a2.121 2.121 0 0 1-3 0l-1-1a2.121 2.121 0 0 1 0-3L17 5"></path>
               <circle cx="7.5" cy="16.5" r="1.5"></circle>
@@ -674,8 +682,14 @@
         </form>
 
         <div class="auth-footer">
-          <span>Need an analyzer account?</span>
-          <a href="#" onclick="alert('Access requests are approved by your local workspace administrator.'); return false;">Request Access</a>
+          <div>
+            <span>Need an analyzer account?</span>
+            <a href="#" onclick="alert('Access requests are approved by your local workspace administrator.'); return false;">Request Access</a>
+          </div>
+          <div class="guest-link-wrapper">
+            <span>Explore as guest?</span>
+            <a href="analyzer.html">Launch Analyzer without login →</a>
+          </div>
         </div>
       </div>
     </main>
@@ -707,7 +721,7 @@
       } else {
         passwordInput.type = 'password';
         eyeIcon.innerHTML = `
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
           <circle cx="12" cy="12" r="3"></circle>
         `;
       }
@@ -717,7 +731,6 @@
       event.preventDefault();
       const email = document.getElementById('email').value;
       const submitBtn = event.target.querySelector('.btn-submit');
-      const originalText = submitBtn.innerHTML;
 
       submitBtn.innerHTML = `
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;">
@@ -729,9 +742,22 @@
       submitBtn.disabled = true;
 
       setTimeout(() => {
-        alert('Welcome back! Successfully authenticated to local Digital Shadow instance as: ' + email);
-        window.location.href = 'index.html';
-      }, 900);
+        window.location.href = 'analyzer.html';
+      }, 700);
+    }
+
+    function handlePasskey() {
+      const passkeyBtn = document.querySelector('.btn-secondary-auth');
+      passkeyBtn.innerHTML = `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;">
+          <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+          <path d="M12 2a10 10 0 0 1 10 10"></path>
+        </svg>
+        <span>Verifying Security Key...</span>
+      `;
+      setTimeout(() => {
+        window.location.href = 'analyzer.html';
+      }, 700);
     }
   </script>
   <style>
@@ -742,4 +768,3 @@
   </style>
 </body>
 </html>
-

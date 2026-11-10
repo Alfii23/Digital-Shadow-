@@ -2,7 +2,10 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/login", "destination": "/login.html" },
-    { "source": "/login.html", "destination": "/login.html" }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/login.html", "destination": "/index.html" },
+    { "source": "/analyzer", "destination": "/analyzer.html" },
+    { "source": "/analyzer.html", "destination": "/analyzer.html" }
   ]
 }

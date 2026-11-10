@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Shadow – Privacy Risk Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    /* -------------------------------------------------------------
+       CSS RESET & BASE VARIABLES
+    -------------------------------------------------------------- */
+    :root {
+      --bg-main: #060D19;
+      --bg-secondary: #081525;
+      --primary-cyan: #08D5F5;
+      --electric-blue: #338AF5;
+      --purple: #8962F5;
+      --text-primary: #EDF2FF;
+      --text-secondary: #91A5C6;
+      --border-color: #102D42;
+      --border-cyan-glow: rgba(8, 213, 245, 0.35);
+      --gradient-accent: linear-gradient(95deg, #06C8EE, #3986F5, #9360EF);
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Page container to mirror ~1784 x 862 viewport proportions */
+    .app-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    /* -------------------------------------------------------------
+       NAVIGATION BAR
+    -------------------------------------------------------------- */
+    .navbar {
+      height: 75px;
+      width: 100%;
+      border-bottom: 1px solid var(--border-color);
+      background-color: rgba(6, 13, 25, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      width: 100%;
+      max-width: 1560px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-logo-group {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .logo-square {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #08D5F5 0%, #338AF5 52%, #8962F5 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(8, 213, 245, 0.25);
+      flex-shrink: 0;
+    }
+
+    .logo-shield-icon {
+      width: 20px;
+      height: 20px;
+      color: #FFFFFF;
+    }
+
+    .brand-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.015em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-item {
+      text-decoration: none;
+      font-size: 14.5px;
+      font-weight: 500;
+      padding: 7px 18px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--primary-cyan);
+      background: rgba(8, 213, 245, 0.08);
+      border: 1px solid rgba(8, 213, 245, 0.25);
+      font-weight: 600;
+    }
+
+    .nav-item.inactive {
+      color: var(--text-secondary);
+      border: 1px solid transparent;
+    }
+
+    .nav-item.inactive:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* -------------------------------------------------------------
+       MAIN CONTENT / HERO WRAPPER
+    -------------------------------------------------------------- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px 28px 24px;
+      text-align: center;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Top Badge */
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      background: rgba(8, 213, 245, 0.08);
+      border: 1px solid rgba(8, 213, 245, 0.32);
+      color: var(--primary-cyan);
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      box-shadow: 0 0 16px rgba(8, 213, 245, 0.1);
+    }
+
+    .badge-icon {
+      width: 13px;
+      height: 13px;
+      stroke-width: 2.5;
+    }
+
+    /* Main Heading */
+    .hero-heading {
+      font-size: 58px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      color: #FFFFFF;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-heading .desktop-break {
+      display: block;
+    }
+
+    .gradient-text {
+      background: var(--gradient-accent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    /* Hero Description */
+    .hero-description {
+      font-size: 19px;
+      line-height: 1.85;
+      color: var(--text-secondary);
+      max-width: 710px;
+      margin: 22px auto 0 auto;
+      font-weight: 400;
+    }
+
+    /* -------------------------------------------------------------
+       STATISTICS SECTION
+    -------------------------------------------------------------- */
+    .statistics-bar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 48px;
+      margin-bottom: 40px;
+      padding: 10px 0;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 52px;
+    }
+
+    .stat-number {
+      font-family: var(--font-mono);
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--primary-cyan);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-top: 9px;
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 48px;
+      background-color: var(--border-color);
+      flex-shrink: 0;
+    }
+
+    /* -------------------------------------------------------------
+       PRIVACY INFORMATION BANNER
+    -------------------------------------------------------------- */
+    .banner-wrapper {
+      width: 100%;
+      max-width: 1380px;
+      padding: 0 24px;
+      margin: 0 auto 32px auto;
+    }
+
+    .privacy-banner {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 15px;
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-align: left;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .privacy-lock-icon {
+      width: 20px;
+      height: 20px;
+      color: var(--primary-cyan);
+      flex-shrink: 0;
+    }
+
+    .privacy-banner-text {
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+
+    .privacy-banner-text strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* -------------------------------------------------------------
+       FLOATING ELEMENTS (BOTTOM RIGHT)
+    -------------------------------------------------------------- */
+    .floating-actions {
+      position: fixed;
+      right: 26px;
+      bottom: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 99;
+    }
+
+    .floating-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+      background-color: var(--bg-secondary);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+      position: relative;
+    }
+
+    .floating-btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(8, 213, 245, 0.4);
+      box-shadow: 0 6px 18px rgba(8, 213, 245, 0.2);
+    }
+
+    /* PDF button styling */
+    .floating-btn.pdf-btn {
+      color: #EDF2FF;
+      background: #0B1C30;
+      border-color: #163B57;
+    }
+
+    .floating-btn.pdf-btn svg {
+      width: 19px;
+      height: 19px;
+      color: #F87171;
+    }
+
+    /* AI assistant button styling */
+    .floating-btn.ai-btn {
+      background: #091728;
+      border-color: #173854;
+      color: var(--primary-cyan);
+    }
+
+    .floating-btn.ai-btn svg {
+      width: 19px;
+      height: 19px;
+      color: var(--primary-cyan);
+    }
+
+    /* Tooltip */
+    .floating-btn .tooltip {
+      position: absolute;
+      right: 50px;
+      background: #0c1c30;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateX(6px);
+      transition: all 0.2s ease;
+    }
+
+    .floating-btn:hover .tooltip {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* -------------------------------------------------------------
+       RESPONSIVE DESIGN (TABLET & MOBILE)
+    -------------------------------------------------------------- */
+    @media (max-width: 1024px) {
+      .hero-heading {
+        font-size: 46px;
+      }
+      .stat-item {
+        padding: 0 36px;
+      }
+      .nav-container {
+        padding: 0 24px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-heading {
+        font-size: 34px;
+        line-height: 1.25;
+      }
+
+      .hero-heading .desktop-break {
+        display: inline;
+      }
+
+      .hero-description {
+        font-size: 16px;
+        line-height: 1.65;
+      }
+
+      .statistics-bar {
+        flex-direction: column;
+        gap: 24px;
+        width: 100%;
+        margin-top: 36px;
+        margin-bottom: 32px;
+      }
+
+      .stat-item {
+        padding: 0;
+      }
+
+      .stat-divider {
+        display: none;
+      }
+
+      .privacy-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 16px 20px;
+        gap: 12px;
+      }
+
+      .floating-actions {
+        right: 16px;
+        bottom: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar {
+        height: 65px;
+      }
+
+      .brand-title {
+        font-size: 17px;
+      }
+
+      .hero-heading {
+        font-size: 28px;
+      }
+
+      .stat-number {
+        font-size: 32px;
+      }
+
+      .banner-wrapper {
+        padding: 0 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- NAVIGATION BAR -->
+    <header class="navbar">
+      <div class="nav-container">
+        <!-- Brand Logo and Name -->
+        <a href="analyzer.html" class="brand-logo-group">
+          <div class="logo-square">
+            <!-- Shield SVG Icon -->
+            <svg class="logo-shield-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <span class="brand-title">Digital Shadow</span>
+        </a>
+
+        <!-- Navigation Links -->
+        <nav class="nav-links">
+          <a href="#analyzer" class="nav-item active">Analyzer</a>
+          <a href="#about" class="nav-item inactive">About</a>
+          <a href="index.html" class="nav-item inactive" title="Lock session and sign out">Sign Out</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- HERO SECTION & STATISTICS -->
+    <main class="main-content">
+      <!-- Risk Analyzer Badge -->
+      <div class="badge-pill">
+        <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span>PRIVACY RISK ANALYZER · LOCAL &amp; PRIVATE</span>
+      </div>
+
+      <!-- Main Heading with Exact Line Breaks and Targeted Gradient -->
+      <h1 class="hero-heading">
+        How much of your<br class="desktop-break" />
+        <span class="gradient-text">digital shadow</span> is visible?
+      </h1>
+
+      <!-- Description -->
+      <p class="hero-description">
+        Discover what personal information you're unintentionally exposing online. Enter the data you publicly share and receive a detailed, explainable privacy risk report — processed entirely on this server, nothing sent to third parties.
+      </p>
+
+      <!-- Statistics Section -->
+      <section class="statistics-bar" aria-label="Key Statistics">
+        <!-- Statistic 1 -->
+        <div class="stat-item">
+          <div class="stat-number">6</div>
+          <div class="stat-label">EXPOSURE CATEGORIES</div>
+        </div>
+
+        <div class="stat-divider" role="separator" aria-orientation="vertical"></div>
+
+        <!-- Statistic 2 -->
+        <div class="stat-item">
+          <div class="stat-number">15+</div>
+          <div class="stat-label">DETECTION RULES</div>
+        </div>
+
+        <div class="stat-divider" role="separator" aria-orientation="vertical"></div>
+
+        <!-- Statistic 3 -->
+        <div class="stat-item">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">LOCAL ANALYSIS</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- PRIVACY INFORMATION BANNER -->
+    <footer class="banner-wrapper">
+      <div class="privacy-banner">
+        <!-- Lock SVG Icon -->
+        <svg class="privacy-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+
+        <!-- Privacy Policy Text with Highlighted Key Terms -->
+        <div class="privacy-banner-text">
+          <strong>Your privacy matters.</strong> All analysis runs <strong>locally on this server</strong>. None of your submitted information is transmitted to third-party services. URLs are analyzed structurally — <strong>no outbound requests are made</strong> to any URL you submit. Only a minimal, anonymized report summary is stored if you enable history.
+        </div>
+      </div>
+    </footer>
+
+    <!-- FLOATING ACTIONS (PDF & AI ASSISTANT) -->
+    <aside class="floating-actions" aria-label="Quick Actions">
+      <!-- PDF Document Icon -->
+      <button class="floating-btn pdf-btn" type="button" aria-label="Export PDF report">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <span class="tooltip">Export PDF</span>
+      </button>
+
+      <!-- AI Assistant Icon -->
+      <button class="floating-btn ai-btn" type="button" aria-label="AI Assistant">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+        </svg>
+        <span class="tooltip">Privacy Assistant</span>
+      </button>
+    </aside>
+  </div>
+</body>
+</html>
